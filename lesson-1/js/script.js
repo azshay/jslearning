@@ -1,4 +1,19 @@
-"use stroct"
+"use strict";
+
+const numberOfFilms = +prompt('Сколько фильмов вы уже посмотрели?', '');
+
+const personalMovieDB = {
+    count: numberOfFilms,
+    movies: {},
+    actors: {},
+    genres: {},
+    privat: false
+};
+
+personalMovieDB.movies.movieTitle = prompt('Один из последних просмотренных фильмов?', '');
+personalMovieDB.movies.movieScore = prompt('На сколько вы оцените его?', '');
+personalMovieDB.movies.movieTitle = prompt('Один из последних просмотренных фильмов?', '');
+personalMovieDB.movies.movieScore = prompt('На сколько вы оцените его?', '');
 
 // 'use strict';
 

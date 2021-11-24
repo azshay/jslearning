@@ -12,18 +12,59 @@
 
 5) Добавить нумерацию выведенных фильмов */
 
-'use strict';
+"use strict";
+
+let counter = 0;
 
 const movieDB = {
     movies: [
         "Логан",
-        "Лига справедливости",
+        "Лига справедливости :)",
         "Ла-ла лэнд",
         "Одержимость",
-        "Скотт Пилигрим против..."
-    ]
+        "Скотт Пилигрим против...",
+    ],
 };
 
-document.querySelector('.promo__adv').remove();
-document.querySelector('.promo__genre').textContent = "ДРАМА";
-document.querySelector('.promo__bg').style.backgroundImage = "url(../lesson-30/img/bg.jpg)";
+// let counter = movieDB.movies.length;
+movieDB.movies.sort();
+
+// 1. Мой вариант.
+// document.querySelector(".promo__adv").remove();
+
+// 1. Вариант препод-ля
+document.querySelectorAll(".promo__adv img").forEach(item => {
+    item.remove();
+});
+
+// 2. 
+document.querySelector(".promo__genre").textContent = "ДРАМА";
+
+// 3.
+document.querySelector(".promo__bg").style.backgroundImage =
+    "url(../lesson-30/img/bg.jpg)";
+// document.querySelectorAll(".promo__interactive-item").forEach((item) => {
+//      item.innerHTML = `${movieDB.movies[counter]}<div class="delete"></div>`;
+//      counter++;
+//      console.log(movieDB.movies[counter]);
+// });
+
+// document.querySelectorAll(".promo__interactive-item").forEach((item) => {
+//     if (counter != 0) {
+//         item.innerHTML = `${movieDB.movies.length - counter + 1}. ${movieDB.movies[movieDB.movies.length - counter]}<div class="delete"></div>`;
+//         counter--;
+//     }
+// });
+
+const filmsList = document.querySelector(".promo__interactive-list");
+filmsList.innerHTML = '';
+
+while (counter != movieDB.movies.length) {
+    filmsList.insertAdjacentHTML('beforeend', `
+        <li class="promo__interactive-item">
+            ${counter + 1}. ${movieDB.movies[counter]}
+            <div class="delete"></div>
+        </li>
+    `);
+    counter++;
+}

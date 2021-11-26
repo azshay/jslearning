@@ -15,11 +15,14 @@
 "use strict";
 
 let counter = 0;
+const formToAddFilm = document.querySelector(".add");
+const addingFilmInput = formToAddFilm.querySelector(".adding__input");
+let deleteElements = document.querySelectorAll('.delete');
 
 const movieDB = {
     movies: [
         "Логан",
-        "Лига справедливости :)",
+        "Лига справедливости",
         "Ла-ла лэнд",
         "Одержимость",
         "Скотт Пилигрим против...",
@@ -27,7 +30,6 @@ const movieDB = {
 };
 
 // let counter = movieDB.movies.length;
-movieDB.movies.sort();
 
 // 1. Мой вариант.
 // document.querySelector(".promo__adv").remove();
@@ -56,15 +58,58 @@ document.querySelector(".promo__bg").style.backgroundImage =
 //     }
 // });
 
-const filmsList = document.querySelector(".promo__interactive-list");
-filmsList.innerHTML = '';
 
-while (counter != movieDB.movies.length) {
-    filmsList.insertAdjacentHTML('beforeend', `
-        <li class="promo__interactive-item">
-            ${counter + 1}. ${movieDB.movies[counter]}
-            <div class="delete"></div>
-        </li>
-    `);
-    counter++;
+const filmsList = document.querySelector(".promo__interactive-list");
+
+function getMovies() {
+    filmsList.innerHTML = '';
+
+    movieDB.movies.forEach(item => {
+        item.toUpperCase();
+    });
+    movieDB.movies.sort();
+
+    while (counter != movieDB.movies.length) {
+        let movieTemp = movieDB.movies[counter];
+
+        if (movieTemp.length > 21) {
+            movieTemp = movieTemp.substr(0, 21) + "...";
+        }
+
+        filmsList.insertAdjacentHTML('beforeend', `
+            <li class="promo__interactive-item">
+                ${counter + 1}. ${movieTemp}
+                <div class="delete"></div>
+            </li>
+        `);
+        counter++;
+    }
+    counter = 0;
+    deleteEvent();
+}
+
+getMovies();
+
+formToAddFilm.lastElementChild.addEventListener('click', function (e) {
+    e.preventDefault();
+    movieDB.movies.push(addingFilmInput.value.toUpperCase());
+    deleteElements = document.querySelectorAll('.delete');
+    if (formToAddFilm.lastElementChild.previousElementSibling.previousElementSibling.checked) {
+        alert("Добавляем любимый фильм");
+    }
+    getMovies();
+});
+
+function deleteEvent() {
+    let indexToDeleteElement = 0;
+    deleteElements = document.querySelectorAll('.delete');
+
+    deleteElements.forEach(item => {
+        item.addEventListener('click', function (event) {
+            indexToDeleteElement = +event.target.previousSibling.data.substr(17, 1);
+            movieDB.movies.splice(indexToDeleteElement - 1, 1);
+            event.target.parentElement.remove();
+            getMovies();
+        });
+    });
 }

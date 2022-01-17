@@ -44,7 +44,7 @@ document.querySelector(".promo__genre").textContent = "ДРАМА";
 
 // 3.
 document.querySelector(".promo__bg").style.backgroundImage =
-    "url(../lesson-30/img/bg.jpg)";
+    "url(../img/bg.jpg)";
 // document.querySelectorAll(".promo__interactive-item").forEach((item) => {
 //      item.innerHTML = `${movieDB.movies[counter]}<div class="delete"></div>`;
 //      counter++;

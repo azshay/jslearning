@@ -199,4 +199,60 @@ window.addEventListener("DOMContentLoaded", () => {
     new MenuItem('img/tabs/post.jpg', 'Post', 'Меню "Постное"',
         'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
         '430', '.menu .container').render();
+
+    const forms = document.querySelectorAll('form');
+
+    const messages = {
+        loading: 'Loading...',
+        success: 'Success! :)',
+        error: 'Error! Please try again later.'
+    }
+
+    forms.forEach(form => {
+        postData(form);
+    });
+
+    function postData(form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            let statusMessage = document.createElement('div');
+            statusMessage.classList.add('status');
+            statusMessage.innerHTML = messages.loading;
+            form.appendChild(statusMessage);
+
+            const request = new XMLHttpRequest();
+            request.open('POST', 'server.php'); // Путь относительно index.html
+            request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            const formData = new FormData(form); // На вход - форма
+
+            console.log(formData + " FormData закончилась.");
+
+            const object = {};
+            formData.forEach(function (value, key) {
+                object[key] = value;
+            });
+
+            console.log(object);
+
+            const json = JSON.stringify(object);
+
+            console.log(json);
+
+            request.send(json);
+
+            request.addEventListener('load', () => {
+                if (request.status === 200) {
+                    console.log(request.response);
+                    statusMessage.innerHTML = messages.success;
+                    form.reset();
+                    setTimeout(() => {
+                        statusMessage.remove();
+                    }, 3000);
+                } else {
+                    statusMessage.innerHTML = messages.error;
+                }
+            });
+        });
+    }
 });

@@ -1,46 +1,77 @@
-class MarvelService {
-	_apiBase = 'https://gateway.marvel.com:443/v1/public/';
-	_apiKey = 'apikey=5daba53f32abac386b928ac9093db014';
-	_apiOffset = 210;
+import { useHttp } from "../hooks/http.hook";
 
-	getResource = async (url) => {
-		let res = await fetch(url);
+const useMarvelService = () => {
+	const { loading, request, error, clearError } = useHttp();
 
-		if (!res.ok) {
-			throw new Error(`Could not fetch ${url}, status: ${res.status}`);
+	const _apiBase = "https://gateway.marvel.com:443/v1/public/";
+	const _apiKey = "apikey=5daba53f32abac386b928ac9093db014";
+	let _apiOffset = 210;
+
+	const getAllComics = async (offset = 0) => {
+		const res = await request(
+			`${_apiBase}/comics?orderBy=-onsaleDate&limit=8&offset=${offset}&${_apiKey}`
+		);
+
+		return res.data.results.map(_transformComics);
+	};
+
+	const _transformComics = (comics) => {
+		if (comics.prices[0].price === 0) {
+			comics.prices[0].price = "NOT AVAILABLE";
+		} else {
+			comics.prices[0].price += "$";
 		}
 
-		return await res.json();
+		return {
+			thumbnail: comics.thumbnail.path + "." + comics.thumbnail.extension,
+			name: comics.title,
+			price: comics.prices[0].price,
+			url: comics.urls[0].url,
+			id: comics.id,
+		};
 	};
 
-	getAllCharacters = async (offset = this._apiOffset) => {
-		const res = await this.getResource(`${this._apiBase}characters?limit=9&offset=${offset}&${this._apiKey}`);
-		return res.data.results.map(this._transformCharacter);
+	const getAllCharacters = async (offset = _apiOffset) => {
+		const res = await request(
+			`${_apiBase}characters?limit=9&offset=${offset}&${_apiKey}`
+		);
+		return res.data.results.map(_transformCharacter);
 	};
 
-	getCharacter = async (id) => {
-		const res = await this.getResource(`${this._apiBase}/characters/${id}?${this._apiKey}`);
-		return this._transformCharacter(res.data.results[0]);
+	const getCharacter = async (id) => {
+		const res = await request(`${_apiBase}/characters/${id}?${_apiKey}`);
+		return _transformCharacter(res.data.results[0]);
 	};
 
-	_transformCharacter = (character) => {
-		if (character.description === '') {
-			character.description = 'No information about this character';
+	const _transformCharacter = (character) => {
+		if (character.description === "") {
+			character.description = "No information about this character";
 		} else if (character.description.length > 200) {
-			character.description = character.description.substring(0, 200) + '...';
+			character.description =
+				character.description.substring(0, 200) + "...";
 		}
 
 		return {
 			name: character.name,
 			description: character.description,
-			thumbnail: character.thumbnail.path + '.' + character.thumbnail.extension,
+			thumbnail:
+				character.thumbnail.path + "." + character.thumbnail.extension,
 			homepage: character.urls[0].url,
 			wiki: character.urls[1].url,
 			id: character.id,
 			selected: false,
-			comics: character.comics.items
+			comics: character.comics.items,
 		};
 	};
-}
 
-export default MarvelService;
+	return {
+		loading,
+		error,
+		getAllComics,
+		getAllCharacters,
+		getCharacter,
+		clearError,
+	};
+};
+
+export default useMarvelService;

@@ -1,51 +1,43 @@
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, Fragment } from "react";
 
-import Spinner from '../spinner/Spinner';
-import ErrorMessage from '../errorMessage/ErrorMessage';
-import MarvelService from '../../services/MarvelService';
-import Skeleton from '../skeleton/Skeleton';
-import PropTypes from 'prop-types';
+import Spinner from "../spinner/Spinner";
+import ErrorMessage from "../errorMessage/ErrorMessage";
+import useMarvelService from "../../services/MarvelService";
+import Skeleton from "../skeleton/Skeleton";
+import PropTypes from "prop-types";
 
-import './charInfo.scss';
+import "./charInfo.scss";
 
 const CharInfo = (props) => {
-	const [ character, setCharacter ] = useState(null);
-	const [ loading, setLoading ] = useState(false);
-	const [ error, setError ] = useState(false);
+	const [character, setCharacter] = useState(null);
 
-	const marvelService = new MarvelService();
+	const { loading, error, getCharacter, clearError } = useMarvelService();
 
 	const onCharacterLoaded = (character) => {
 		setCharacter(character);
-		setLoading(false);
-	};
-
-	const onError = () => {
-		setError(true);
-		setLoading(false);
 	};
 
 	const updateChar = () => {
+		clearError();
+
 		const { id } = props;
 
 		if (id) {
-			setLoading(true);
-			marvelService.getCharacter(id).then(onCharacterLoaded).catch(onError);
+			getCharacter(id).then(onCharacterLoaded);
 		}
 	};
 
-	useEffect(
-		() => {
-			updateChar();
-			console.log('1');
-		},
-		[ props ]
-	);
+	useEffect(() => {
+		updateChar();
+		console.log("1");
+	}, [props]);
 
 	const skeleton = !(loading || error || character) ? <Skeleton /> : null;
 	const loadElement = loading ? <Spinner /> : null;
 	const errorElement = error ? <ErrorMessage /> : null;
-	const content = !(loading || error || !character) ? <View char={character} /> : null;
+	const content = !(loading || error || !character) ? (
+		<View char={character} />
+	) : null;
 
 	return (
 		<div className="char__info">
@@ -60,10 +52,13 @@ const CharInfo = (props) => {
 const View = ({ char }) => {
 	const { name, description, thumbnail, homepage, wiki, comics } = char;
 
-	let itemClassList = 'char__img';
+	let itemClassList = "char__img";
 
-	if (thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
-		itemClassList += ' char__img_full';
+	if (
+		thumbnail ===
+		"http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg"
+	) {
+		itemClassList += " char__img_full";
 	}
 
 	const comicsRender = (comics) => {
@@ -77,13 +72,17 @@ const View = ({ char }) => {
 					);
 				}
 			});
-		} else return 'No comics yet...';
+		} else return "No comics yet...";
 	};
 
 	return (
 		<Fragment>
 			<div className="char__basics">
-				<img src={thumbnail} alt={name + ' character'} className={itemClassList} />
+				<img
+					src={thumbnail}
+					alt={name + " character"}
+					className={itemClassList}
+				/>
 				<div>
 					<div className="char__info-name">{name}</div>
 					<div className="char__btns">
